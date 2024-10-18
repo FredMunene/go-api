@@ -39,9 +39,11 @@ func main() {
 		fmt.Fprintf(w, "Hello, World\n")
 		w.Write([]byte("there is no post at the moment"))
 	})
-	http.HandleFunc("POST /blogs", createBlogPostHandler)
 
-	err := http.ListenAndServe(endpoint,nil)
+	// create a post
+	http.HandleFunc("POST /create", createBlogPostHandler)
+	// get a blogpost
+	http.HandleFunc("GET /blogs",getBlogPostByTitleHandler)
 
 	if err != nil {
 		fmt.Println("SErver failed")
@@ -49,18 +51,28 @@ func main() {
 	}
 }
 
-func createBlogPostHandler(w http.ResponseWriter, r *http.Request) {	
+func createBlogPostHandler(w http.ResponseWriter, r *http.Request) {
 	var blogPost BlogPost
 
+	// read content from request body into a new decoder
 	decoder := json.NewDecoder(r.Body)
+	// decode content into our blog struct
 	err := decoder.Decode(&blogPost)
 	if err != nil {
-		http.Error(w,"Failed to decode request body", http.StatusInternalServerError)
+		http.Error(w, "Failed to decode request body", http.StatusInternalServerError)
 	}
+	// check for uniwue blog title
 
+	 _, ok := blogPosts[blogPost.Title]
+	 if ok {
+		http.Error(w,"Blog title already exists",http.StatusBadRequest)
+	 }
+
+	// append post to our memory
 	blogPosts[blogPost.Title] = blogPost
 
-	fmt.Fprintf(w,"%+v",blogPost)
+	// prints out structs with field names
+	fmt.Fprintf(w, "%+v", blogPost)
 }
 
 func listBlogPostHandler(w http.ResponseWriter, r *http.Request){
