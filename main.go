@@ -45,6 +45,21 @@ func main() {
 	// get a blogpost
 	http.HandleFunc("GET /blogs",getBlogPostByTitleHandler)
 
+	// list title of blogs
+	http.HandleFunc("GET /list",listBlogPostHandler)
+
+	// list title of blogs
+	http.HandleFunc("GET /count",increaseCountHandler)
+
+	// edit a blog post
+	http.HandleFunc("PUT /edit",updateSpecificBlogPostTitleHandler)
+
+	// delete a blog post
+
+	http.HandleFunc("DELETE /delete", deleteSpecificBlog)
+
+	fmt.Printf("server started at http://%v\n",endpoint)
+	err := http.ListenAndServe(endpoint, nil)
 	if err != nil {
 		fmt.Println("SErver failed")
 		return
@@ -76,10 +91,20 @@ func createBlogPostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func listBlogPostHandler(w http.ResponseWriter, r *http.Request){
+	titles := []string{}
 
-}
+	for _, blog := range blogPosts{
+		titles = append(titles, blog.Title)
+	}
 
-func getBlogPostTitleHandler(w http.ResponseWriter, r *http.Request){
+	if len(titles) == 0 {
+		http.Error(w,"no blog posts found",http.StatusNotFound)
+	}
+
+	json.NewEncoder(w).Encode(titles)
+
+	// fmt.Fprintf(w,"%v",titles)
+
 
 }
 
