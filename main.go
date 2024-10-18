@@ -173,26 +173,45 @@ func updateSpecificBlogPostTitleHandler(w http.ResponseWriter, r *http.Request){
 
 	}
 	var update BlogPost
-	// read request body
 
+	// read request body
 	if err := json.NewDecoder(r.Body).Decode(&update); err != nil {
 		http.Error(w, "Failed to decode request body", http.StatusBadRequest)
 		return
 	}
 
-
+	// update post
 	blogPosts[title] = update
+	blogPost = update
 
+	// return ok status
 	w.WriteHeader(http.StatusOK)
 
+	// return updated content
 	json.NewEncoder(w).Encode(blogPost)
 
 }
-// create a blog post api endpoint 
-// 1.Create and save blog post on the map
-// 2.
-// 3.Edit a blog post
-// 4. 
-// 5. 
 
-// get - query parameter :: /blogs?title=best
+func deleteSpecificBlog(w http.ResponseWriter, r *http.Request){
+	title := r.URL.Query().Get("title")
+
+	// retrieve blog
+	_,ok := blogPosts[title]
+	if !ok {
+		http.Error(w,"No blog with such title",http.StatusNotFound)
+	}
+
+	delete(blogPosts,title)
+
+
+	w.WriteHeader(http.StatusOK)
+
+}
+// // create a blog post api endpoint
+// // 1. Create and save blog post on the map.
+// // 2. List all blog titles.
+// // 3. Edit a blog post by title.
+// // 4. Increase viewcount.
+// // 5. Delete a blog post.
+
+// // get - query parameter :: /blogs?title=best
