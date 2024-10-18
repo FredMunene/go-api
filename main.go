@@ -6,17 +6,21 @@ import (
 	"net/http"
 )
 
+// POST : create
+// PUT : update
+// DELETE : delete
+// GET : read
 
 type BlogPost struct {
-	Title string
+	Title   string
 	Content string
-	Tags [] string
-	Scope Scope
+	Tags    []string
+	Scope   Scope
 }
 
-type Scope struct{
-	IsPublic bool
-	Author string
+type Scope struct {
+	IsPublic   bool
+	Author     string
 	ViewsCount int
 }
 
