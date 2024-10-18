@@ -108,13 +108,15 @@ func listBlogPostHandler(w http.ResponseWriter, r *http.Request){
 
 }
 
-func getBlogPostByTitleHandler(w http.ResponseWriter, r http.Request){
+func increaseCountHandler(w http.ResponseWriter, r *http.Request){
+	// retrieve title of blog
 	title := r.URL.Query().Get("title")
 	if title == ""{
 		http.Error(w, "Title is required", http.StatusBadRequest)
 		return
 	}
 
+	// check title is present
 	blogPost, ok := blogPosts[title]
 	if !ok {
 		http.Error(w,"BlogPost not found", http.StatusNotFound)
@@ -122,17 +124,48 @@ func getBlogPostByTitleHandler(w http.ResponseWriter, r http.Request){
 
 	}
 
-	json.NewEncoder(w).Encode(blogPost)
+	blogPost.Scope.ViewsCount++
 
+	blogPosts[title] = blogPost
+
+	// into writer, encode the contents
+	json.NewEncoder(w).Encode(blogPost)
 }
 
-func updateSpecificBlogPostTitleHandler(w http.ResponseWriter, r http.Request){
+func getBlogPostByTitleHandler(w http.ResponseWriter, r *http.Request){
+	// retrieve title of blog
 	title := r.URL.Query().Get("title")
 	if title == ""{
 		http.Error(w, "Title is required", http.StatusBadRequest)
 		return
 	}
 
+	// check title is present
+	blogPost, ok := blogPosts[title]
+	if !ok {
+		http.Error(w,"BlogPost not found", http.StatusNotFound)
+		return
+
+	}
+
+	// into writer, encode the contents
+	if  err := json.NewEncoder(w).Encode(blogPost); err != nil {
+		http.Error(w,"BlogPost not found", http.StatusInternalServerError)
+		return
+	}
+
+}
+
+func updateSpecificBlogPostTitleHandler(w http.ResponseWriter, r *http.Request){
+	// get title
+	// check title is provided
+	title := r.URL.Query().Get("title")
+	if title == ""{
+		http.Error(w, "Title is required", http.StatusBadRequest)
+		return
+	}
+
+	// check if such post exists
 	blogPost, ok := blogPosts[title]
 	if !ok {
 		http.Error(w,"BlogPost not found", http.StatusNotFound)
