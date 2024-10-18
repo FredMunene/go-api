@@ -29,13 +29,15 @@ type Scope struct {
 var blogPosts = make(map[string]BlogPost)
 
 // methods
-// 
+//
 
-func main(){
+func main() {
 	endpoint := "localhost:3000"
 
-	http.HandleFunc("GET /hello", func(w http.ResponseWriter, r *http.Request) {	
-		fmt.Fprintf(w, "Hello, World")
+	// initial load
+	http.HandleFunc("GET /hello", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello, World\n")
+		w.Write([]byte("there is no post at the moment"))
 	})
 	http.HandleFunc("POST /blogs", createBlogPostHandler)
 
